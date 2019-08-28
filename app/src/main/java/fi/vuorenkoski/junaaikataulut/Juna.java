@@ -5,19 +5,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Juna implements Comparable<Juna> {
-    char tunnus;
-    int raide;
-    Date lahtoAika;
-    boolean peruttu;
-    boolean arvioOn;
-    Date arvioituAika;
-    Date saapumisAika;
-    String saapumisAsema;
-    String paateasema;
+    private Asema lahtoasema;
+    private char tunnus;
+    private String raide;
+    private Date lahtoAika;
+    private boolean peruttu;
+    private boolean arvioOn;
+    private Date arvioituAika;
+    private Date saapumisAika;
+    private Asema saapumisAsema;
+    private Asema paateasema;
 
     int myohassa;
 
-    public Juna(char tunnus, int raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema) {
+    public Juna(String lahtoasema, char tunnus, String raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema) {
+        this.lahtoasema=new Asema(lahtoasema);
         this.tunnus = tunnus;
         this.raide = raide;
         this.lahtoAika = lahtoAika;
@@ -25,8 +27,8 @@ public class Juna implements Comparable<Juna> {
         this.arvioOn = arvioOn;
         this.arvioituAika = arvioituAika;
         this.saapumisAika = saapumisAika;
-        this.saapumisAsema=saapumisAsema;
-        this.paateasema = paateasema;
+        this.saapumisAsema=new Asema(saapumisAsema);
+        this.paateasema = new Asema(paateasema);
         this.myohassa = (int)((arvioituAika.getTime()-lahtoAika.getTime())/1000);
         if (this.myohassa<60) this.myohassa=0;
     }
