@@ -44,15 +44,10 @@
             android:id="@+id/button_paivita"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:onClick="paivitaData"
             android:text="Päivitä" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/testiLaatikko"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/junaLista"

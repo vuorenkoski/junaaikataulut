@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Juna implements Comparable<Juna> {
+    private int numero;
     private Asema lahtoasema;
     private char tunnus;
     private String raide;
@@ -18,7 +19,8 @@ public class Juna implements Comparable<Juna> {
 
     int myohassa;
 
-    public Juna(String lahtoasema, char tunnus, String raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema) {
+    public Juna(int numero, String lahtoasema, char tunnus, String raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema) {
+        this.numero=numero;
         this.lahtoasema=new Asema(lahtoasema);
         this.tunnus = tunnus;
         this.raide = raide;
@@ -47,6 +49,20 @@ public class Juna implements Comparable<Juna> {
 
     public Date getLahtoAika() {
         return lahtoAika;
+    }
+
+    public char getTunnus() {
+        return tunnus;
+    }
+
+    public String getRaide() {
+        return raide;
+    }
+
+    public String getLahtoAikaKorjattuStr() {
+        if (this.myohassa!=0) {
+            return aikaString(lahtoAika)+"-->"+aikaString(arvioituAika);
+        } else return aikaString(lahtoAika);
     }
 
     private String aikaString(Date date) {

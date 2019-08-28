@@ -64,11 +64,6 @@ public class MainActivity extends AppCompatActivity {
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
-        // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(myDataset);
-        recyclerView.setAdapter(mAdapter);
-
     }
 
     public static ArrayList<Juna> haeJunat(String asema, String maaranpaa) throws MalformedURLException {
@@ -88,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 if (tunnusStr.length()==1) { // kauko ym. junilla tämä koodi on tyhjä
                     char tunnus=tunnusStr.charAt(0);
                     JSONArray aikatauluRivit=data.getJSONObject(i).getJSONArray("timeTableRows"); // Aikautalutiedot
+
+                    int numero=data.getJSONObject(i).getInt("trainNumber");
 
                     // Junan koko reitin aikataulutiedot on asemittain, erikseen DEPARTURE ja ARRIVAL
                     // ensin etsitään asema jolta halutaan lähteä
@@ -127,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!arvioOn) arvioituAika=lahtoAika;
 
                     if (saapumisAsemaLoytyi && arvioituAika.compareTo(nykyhetki)>0) {
-                        junat.add(new Juna(asema,tunnus, raide, lahtoAika, peruttu, arvioOn, arvioituAika, saapumisAika, maaranpaa, paateasema));
+                        junat.add(new Juna(numero,asema,tunnus, raide, lahtoAika, peruttu, arvioOn, arvioituAika, saapumisAika, maaranpaa, paateasema));
                     }
                 }
             }
@@ -150,15 +147,10 @@ public class MainActivity extends AppCompatActivity {
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-            String tulos = "";
-            if (junat != null) {
-                for (int i = 0; i < junat.size(); i++) {
-                    if (i < 8) tulos = tulos + junat.get(i).toString() + "\n";
-                }
-            } else tulos = "Connection error";
 
-            TextView laatikko = findViewById(R.id.testiLaatikko);
-            laatikko.setText(tulos);
+            // specify an adapter (see also next example)
+            mAdapter = new JunaAdapter(this,junat);
+            recyclerView.setAdapter(mAdapter);
         }
     }
 }
