@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 
@@ -25,12 +26,13 @@ import java.util.stream.Collectors;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements JunaAdapter.ItemClickListener {
     private Spinner spinnerLahtoasema;
     private Spinner spinnerMaaraasema;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private JunaAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<Juna> junat;
 
 
     @Override
@@ -57,11 +59,7 @@ public class MainActivity extends AppCompatActivity {
         spinnerMaaraasema.setAdapter(adapterMaaraasema);
 
         recyclerView = (RecyclerView) findViewById(R.id.junaLista);
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
     }
@@ -72,7 +70,10 @@ public class MainActivity extends AppCompatActivity {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date nykyhetki = new Date(System.currentTimeMillis());
 
-        URL urli=new URL("https://rata.digitraffic.fi/api/v1/live-trains?station="+asema+"&arrived_trains=0&arriving_trains=0&departed_trains=0&departing_trains=50");
+//        URL urli=new URL("https://rata.digitraffic.fi/api/v1/live-trains?station="+asema+"&departing_trains=70&train");
+        URL urli=new URL("https://rata.digitraffic.fi/api/v1/live-trains/station/"+asema+"?departing_trains=50&train_categories=Commuter");
+        // haku aikamäärällä, mutta palauttaa paljon junia
+        // URL urli=new URL("https://rata.digitraffic.fi/api/v1//live-trains/station/"+asema+"?minutes_before_departure=15&minutes_after_departure=15&minutes_before_arrival=240&minutes_after_arrival=15&train_categories=Commuter");
 
         try (Scanner tiedostonLukija = new Scanner(urli.openStream())) {
             JSONArray data=new JSONArray(tiedostonLukija.nextLine());
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     String paateasema="";
                     boolean peruttu=false;
                     String raide="";
+                    String syyt=null;
 
                     for (int j=0;j<aikatauluRivit.length();j++) {
                         if (aikatauluRivit.getJSONObject(j).getString("stationShortCode").equals(asema) &&
@@ -119,12 +121,13 @@ public class MainActivity extends AppCompatActivity {
                             saapumisAika=dateFormat.parse(aikatauluRivit.getJSONObject(j).getString("scheduledTime"));
                         }
                         paateasema=aikatauluRivit.getJSONObject(j).getString("stationShortCode");
+                        syyt=aikatauluRivit.getJSONObject(j).getJSONArray("causes").toString();
                     }
 
                     if (!arvioOn) arvioituAika=lahtoAika;
 
                     if (saapumisAsemaLoytyi && arvioituAika.compareTo(nykyhetki)>0) {
-                        junat.add(new Juna(numero,asema,tunnus, raide, lahtoAika, peruttu, arvioOn, arvioituAika, saapumisAika, maaranpaa, paateasema));
+                        junat.add(new Juna(numero,asema,tunnus, raide, lahtoAika, peruttu, arvioOn, arvioituAika, saapumisAika, maaranpaa, paateasema, syyt));
                     }
                 }
             }
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (!lahto.getLyhenne().equals(maaranpaa.getLyhenne())) {
 
-            ArrayList<Juna> junat = null;
+            junat = null;
             try {
                 junat = haeJunat(lahto.getLyhenne(), maaranpaa.getLyhenne());
             } catch (MalformedURLException e) {
@@ -150,7 +153,17 @@ public class MainActivity extends AppCompatActivity {
 
             // specify an adapter (see also next example)
             mAdapter = new JunaAdapter(this,junat);
+            mAdapter.setClickListener(this);
             recyclerView.setAdapter(mAdapter);
         }
     }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, junat.get(position).getSyyt(), Toast.LENGTH_SHORT).show();
+    }
+
+    //junan paikkatiedon ja nopeuden hakeminen
+    // https://rata.digitraffic.fi/api/v1/train-locations/latest/8334
+
 }

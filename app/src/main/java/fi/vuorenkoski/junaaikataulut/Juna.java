@@ -16,10 +16,11 @@ public class Juna implements Comparable<Juna> {
     private Date saapumisAika;
     private Asema saapumisAsema;
     private Asema paateasema;
+    private String syyt;
 
     int myohassa;
 
-    public Juna(int numero, String lahtoasema, char tunnus, String raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema) {
+    public Juna(int numero, String lahtoasema, char tunnus, String raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema, String syyt) {
         this.numero=numero;
         this.lahtoasema=new Asema(lahtoasema);
         this.tunnus = tunnus;
@@ -33,6 +34,7 @@ public class Juna implements Comparable<Juna> {
         this.paateasema = new Asema(paateasema);
         this.myohassa = (int)((arvioituAika.getTime()-lahtoAika.getTime())/1000);
         if (this.myohassa<60) this.myohassa=0;
+        this.syyt=syyt;
     }
 
     public String getLahtoAikaStr() {
@@ -63,6 +65,16 @@ public class Juna implements Comparable<Juna> {
         if (this.myohassa!=0) {
             return aikaString(lahtoAika)+"-->"+aikaString(arvioituAika);
         } else return aikaString(lahtoAika);
+    }
+
+    public String getSyyt() {
+        return syyt;
+    }
+
+    public String getHuomautus() {
+        if (this.peruttu) return "Peruttu";
+        if (this.arvioOn && !this.getLahtoAikaStr().equals(this.getArvioituAikaStr())) return "->"+this.getArvioituAikaStr();
+        return "";
     }
 
     private String aikaString(Date date) {

@@ -33,7 +33,8 @@ public class JunaAdapter extends RecyclerView.Adapter<JunaAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.tunnusView.setText(""+mData.get(position).getTunnus());
         holder.raideView.setText(""+mData.get(position).getRaide());
-        holder.lahtoaikaView.setText(mData.get(position).getLahtoAikaKorjattuStr());
+        holder.lahtoaikaView.setText(mData.get(position).getLahtoAikaStr());
+        holder.huomautusView.setText(mData.get(position).getHuomautus());
         holder.saapumisaikaView.setText(mData.get(position).getSaapumisAikaStr());
     }
 
@@ -49,6 +50,7 @@ public class JunaAdapter extends RecyclerView.Adapter<JunaAdapter.ViewHolder> {
         TextView tunnusView;
         TextView raideView;
         TextView lahtoaikaView;
+        TextView huomautusView;
         TextView saapumisaikaView;
 
         ViewHolder(View itemView) {
@@ -56,6 +58,7 @@ public class JunaAdapter extends RecyclerView.Adapter<JunaAdapter.ViewHolder> {
             tunnusView=itemView.findViewById(R.id.juna_tunnus);
             raideView=itemView.findViewById(R.id.juna_raide);
             lahtoaikaView=itemView.findViewById(R.id.juna_lahtoaika);
+            huomautusView=itemView.findViewById(R.id.juna_huomautus);
             saapumisaikaView=itemView.findViewById(R.id.juna_saapumisaika);
             itemView.setOnClickListener(this);
         }
