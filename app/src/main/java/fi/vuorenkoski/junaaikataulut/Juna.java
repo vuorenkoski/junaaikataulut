@@ -1,5 +1,7 @@
 package fi.vuorenkoski.junaaikataulut;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,7 +20,10 @@ public class Juna implements Comparable<Juna> {
     private Asema paateasema;
     private String syyt;
 
-    int myohassa;
+    private String nopeus;
+    private LatLng paikka;
+
+    private int myohassa;
 
     public Juna(int numero, String lahtoasema, char tunnus, String raide, Date lahtoAika, boolean peruttu, boolean arvioOn, Date arvioituAika, Date saapumisAika, String saapumisAsema, String paateasema, String syyt) {
         this.numero=numero;
@@ -35,6 +40,9 @@ public class Juna implements Comparable<Juna> {
         this.myohassa = (int)((arvioituAika.getTime()-lahtoAika.getTime())/1000);
         if (this.myohassa<60) this.myohassa=0;
         this.syyt=syyt;
+
+        this.nopeus=null;
+        this.paikka=null;
     }
 
     public String getLahtoAikaStr() {
@@ -55,6 +63,14 @@ public class Juna implements Comparable<Juna> {
 
     public char getTunnus() {
         return tunnus;
+    }
+
+    public LatLng getPaikka() {
+        return paikka;
+    }
+
+    public String getNopeus() {
+        return nopeus;
     }
 
     public String getRaide() {
@@ -80,6 +96,10 @@ public class Juna implements Comparable<Juna> {
     private String aikaString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
         return dateFormat.format(date);
+    }
+
+    public int getNumero() {
+        return numero;
     }
 
     @Override
