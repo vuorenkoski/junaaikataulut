@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:onClick="paivitaData"
-            android:text="Päivitä" />
+            android:text="Hae aikautalu" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

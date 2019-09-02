@@ -3,25 +3,17 @@ package fi.vuorenkoski.junaaikataulut;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import org.json.JSONArray;
-
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 public class MainActivity extends AppCompatActivity implements JunaAdapter.ItemClickListener {
     private Spinner spinnerLahtoasema;
@@ -69,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements JunaAdapter.ItemC
 
         if (!lahto.getLyhenne().equals(maaranpaa.getLyhenne())) {
             try {
-                junat = haeJunat(lahto.getLyhenne(), maaranpaa.getLyhenne());
+                junat = Datahaku.haeJunat(lahto.getLyhenne(), maaranpaa.getLyhenne());
                 mAdapter = new JunaAdapter(this, junat);
                 mAdapter.setClickListener(this);
                 recyclerView.setAdapter(mAdapter);
@@ -81,84 +73,23 @@ public class MainActivity extends AppCompatActivity implements JunaAdapter.ItemC
 
     @Override
     public void onItemClick(View view, int position) {
-//        Toast.makeText(this, junat.get(position).getSyyt(), Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, KarttaNaytto.class);
         intent.putExtra(EXTRA_MESSAGE_NUMERO,String.valueOf(junat.get(position).getNumero()));
         intent.putExtra(EXTRA_MESSAGE_TUNNUS,""+junat.get(position).getTunnus());
         startActivity(intent);
     }
 
-    public static ArrayList<Juna> haeJunat(String asema, String maaranpaa) throws Exception {
-        ArrayList<Juna> junat=new ArrayList<>();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        Date nykyhetki = new Date(System.currentTimeMillis());
-
-        //  URL urli=new URL("https://rata.digitraffic.fi/api/v1/live-trains?station="+asema+"&departing_trains=70&train");
-        // haku aikamäärällä, mutta palauttaa paljon junia
-        // URL urli=new URL("https://rata.digitraffic.fi/api/v1//live-trains/station/"+asema+"?minutes_before_departure=15&minutes_after_departure=15&minutes_before_arrival=240&minutes_after_arrival=15&train_categories=Commuter");
-
-        URL urli=new URL("https://rata.digitraffic.fi/api/v1/live-trains/station/"+asema+"?departing_trains=50&train_categories=Commuter");
-        Scanner tiedostonLukija = new Scanner(urli.openStream());
-        JSONArray data=new JSONArray(tiedostonLukija.nextLine());
-
-        for (int i=0;i<data.length();i++)
-        {
-            String tunnusStr=data.getJSONObject(i).getString("commuterLineID");
-            if (tunnusStr.length()==1) { // kauko ym. junilla tämä koodi on tyhjä
-                char tunnus=tunnusStr.charAt(0);
-                JSONArray aikatauluRivit=data.getJSONObject(i).getJSONArray("timeTableRows"); // Aikautalutiedot
-
-                int numero=data.getJSONObject(i).getInt("trainNumber");
-
-                // Junan koko reitin aikataulutiedot on asemittain, erikseen DEPARTURE ja ARRIVAL
-                // ensin etsitään asema jolta halutaan lähteä
-                boolean lahtoAsemaLoytyi=false;
-                boolean saapumisAsemaLoytyi=false;
-                boolean arvioOn=false;
-                Date arvioituAika=new Date();
-                Date lahtoAika=new Date();
-                Date saapumisAika=new Date();
-                String paateasema="";
-                boolean peruttu=false;
-                String raide="";
-                String syyt=null;
-
-                for (int j=0;j<aikatauluRivit.length();j++) {
-                    if (aikatauluRivit.getJSONObject(j).getString("stationShortCode").equals(asema) &&
-                            aikatauluRivit.getJSONObject(j).getString("type").equals("DEPARTURE") &&
-                            aikatauluRivit.getJSONObject(j).getBoolean("trainStopping")) {
-                        lahtoAsemaLoytyi=true;
-
-                        lahtoAika=dateFormat.parse(aikatauluRivit.getJSONObject(j).getString("scheduledTime"));
-                        if (aikatauluRivit.getJSONObject(j).has("liveEstimateTime")) {
-                            arvioituAika=dateFormat.parse(aikatauluRivit.getJSONObject(j).getString("liveEstimateTime"));
-                            arvioOn=true;
-                        }
-                        peruttu=aikatauluRivit.getJSONObject(j).getBoolean("cancelled");
-                        raide=aikatauluRivit.getJSONObject(j).getString("commercialTrack");
-                    }
-                    if (lahtoAsemaLoytyi && aikatauluRivit.getJSONObject(j).getString("stationShortCode").equals(maaranpaa) &&
-                            aikatauluRivit.getJSONObject(j).getString("type").equals("ARRIVAL") &&
-                            aikatauluRivit.getJSONObject(j).getBoolean("trainStopping")) {
-                        saapumisAsemaLoytyi=true;
-                        saapumisAika=dateFormat.parse(aikatauluRivit.getJSONObject(j).getString("scheduledTime"));
-                    }
-                    paateasema=aikatauluRivit.getJSONObject(j).getString("stationShortCode");
-                    syyt=aikatauluRivit.getJSONObject(j).getJSONArray("causes").toString();
-                }
-
-                if (!arvioOn) arvioituAika=lahtoAika;
-
-                if (saapumisAsemaLoytyi && arvioituAika.compareTo(nykyhetki)>0) {
-                    junat.add(new Juna(numero,asema,tunnus, raide, lahtoAika, peruttu, arvioOn, arvioituAika, saapumisAika, maaranpaa, paateasema, syyt));
-                }
-            }
-        }
-        return junat.stream().sorted().collect(Collectors.toCollection(ArrayList::new));
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_valikko, menu);
+        return true;
     }
 
-    //junan paikkatiedon ja nopeuden hakeminen
-    // https://rata.digitraffic.fi/api/v1/train-locations/latest/8334
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId()==R.id.tietoja) {
+            startActivity(new Intent(this, Tietoja.class));
+        }
+        return true;
+    }
 
 }
