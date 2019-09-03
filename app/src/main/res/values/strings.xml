@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">EUY aikataulut</string>
+
+    <string name="title_activity_kartta_naytto">Map</string>
+    <string name="info_teksti">EUY junien aikataulut</string>
+    <string name="info_teksti2">2.9.2019\nlauri@vuorenkoski.fi\n\nDatalähde:\nhttps://www.digitraffic.fi/rautatieliikenne/</string>
+
+    <string-array name="asematLong">
+        <item>Helsinki</item>
+        <item>Pasila</item>
+        <item>Ilmala</item>
+        <item>Huopalahti</item>
+        <item>Valimo</item>
+        <item>Pitäjänmäki</item>
+        <item>Mäkkylä</item>
+        <item>Leppävaara</item>
+        <item>Kilo</item>
+        <item>Kera</item>
+        <item>Kauniainen</item>
+        <item>Koivuhovi</item>
+        <item>Tuomarila</item>
+        <item>Espoo</item>
+        <item>Kauklahti</item>
+    </string-array>
+
+    <string-array name="asematShort">
+        <item>HKI</item>
+        <item>PSL</item>
+        <item>HPL</item>
+        <item>VMO</item>
+        <item>PJM</item>
+        <item>LPV</item>
+        <item>KIL</item>
+        <item>KEA</item>
+        <item>KNI</item>
+        <item>KVH</item>
+        <item>TRL</item>
+        <item>EPO</item>
+        <item>KLH</item>
+    </string-array>
+    <string-array name="asemaVaihtoehdot">
+        <item>Kauklahti</item>
+        <item>Espoo</item>
+        <item>Leppävaara</item>
+        <item>Huopalahti</item>
+        <item>Pasila</item>
+        <item>Helsinki</item>
+    </string-array>
+
+</resources>
